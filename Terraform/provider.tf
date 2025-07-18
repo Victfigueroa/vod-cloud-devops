@@ -10,8 +10,3 @@ provider "aws" {
     s3 = "http://localhost:4566"
   }
 }
-
-resource "aws_s3_bucket" "devops_bucket" {
-  bucket        = "var.bucket_name"
-  force_destroy = true
-}
