@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@master
         with:
           args: >
             -Dsonar.projectKey=Victfigueroa_vod-cloud-devops
