@@ -44,7 +44,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Run Python Unit Tests
-        run: python3 -m unittest discover
+        run: python -m unittest discover
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -66,7 +66,8 @@ jobs:
         run: terraform plan
         working-directory: terraform
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Terraform Apply (Targeted for aws_s3_bucket only)
+        run: terraform apply -auto-approve -target=aws_s3_bucket.devops_bucket
         working-directory: terraform
+
 
