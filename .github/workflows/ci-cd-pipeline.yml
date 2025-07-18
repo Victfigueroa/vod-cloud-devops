@@ -14,7 +14,7 @@ jobs:
         ports:
           - 4566:4566
         options: >-
-          --health-cmd "curl -f http://localhost:4566/_localstack/health || exit 1"
+          --health-cmd "curl -f http://localhost:4566/health || exit 1"
           --health-interval 5s
           --health-retries 20
           --health-timeout 2s
@@ -58,14 +58,33 @@ jobs:
         with:
           terraform_version: 1.6.6
 
+      - name: Wait for LocalStack to be ready
+        run: |
+          until curl -s http://localhost:4566/health | grep '"initialized":true'; do
+            echo "Waiting for LocalStack..."
+            sleep 5
+          done
+
       - name: Terraform Init
         run: terraform init
         working-directory: terraform
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_REGION: us-east-1
 
       - name: Terraform Plan
         run: terraform plan
         working-directory: terraform
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_REGION: us-east-1
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: terraform
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_REGION: us-east-1
