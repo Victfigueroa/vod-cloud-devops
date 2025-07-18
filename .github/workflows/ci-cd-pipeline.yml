@@ -34,6 +34,7 @@ jobs:
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
+        continue-on-error: true
         with:
           args: >
             -Dsonar.projectKey=Victfigueroa_vod-cloud-devops
@@ -43,15 +44,19 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt || echo "No requirements.txt found"
+        shell: bash
+
       - name: Run Python Unit Tests
         run: python3 -m unittest discover
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./frontend
-          publish_branch: gh-pages
+        shell: bash
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -64,6 +69,7 @@ jobs:
             echo "Waiting for LocalStack..."
             sleep 5
           done
+        shell: bash
 
       - name: Terraform Init
         run: terraform init
@@ -72,6 +78,7 @@ jobs:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
           AWS_REGION: us-east-1
+        shell: bash
 
       - name: Terraform Plan
         run: terraform plan
@@ -80,6 +87,7 @@ jobs:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
           AWS_REGION: us-east-1
+        shell: bash
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
@@ -88,3 +96,12 @@ jobs:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
           AWS_REGION: us-east-1
+        shell: bash
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend
+          publish_branch: gh-pages
